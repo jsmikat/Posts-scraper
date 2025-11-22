@@ -20,6 +20,8 @@ export interface Post {
     likes?: number;
     comments?: number;
     shares?: number;
+    ratio?: number;
+    views?: number;
   };
 }
 
@@ -38,4 +40,120 @@ export interface ApiError {
   success: false;
   error: string;
   timestamp: string;
+}
+
+export interface LinkedInAuthor {
+  fullName: string;
+  headline: string;
+  username: string;
+  url: string;
+}
+
+export interface LinkedInEngagement {
+  numComments: number;
+  likeCount: number;
+  totalReactionCount: number;
+}
+
+export interface LinkedInPostItem {
+  urn: string;
+  url: string;
+  text: string;
+  postedDate: string;
+  postedDateTimestamp: number;
+  author: LinkedInAuthor;
+  socialActivityCountsInsight: LinkedInEngagement;
+}
+
+export interface LinkedInApiResponse {
+  success: boolean;
+  data: {
+    total: number;
+    count: number;
+    items: LinkedInPostItem[];
+  };
+}
+
+export interface RedditPostData {
+  id: string;
+  author: string;
+  title: string;
+  selftext: string;
+  url: string;
+  permalink: string;
+  ups: number;
+  score: number;
+  num_comments: number;
+  upvote_ratio: number;
+  view_count: number | null;
+  created_utc: number;
+}
+
+export interface RedditPostWrapper {
+  kind: string;
+  data: RedditPostData;
+}
+
+export interface RedditApiResponse {
+  success: boolean;
+  data: {
+    cursor: string;
+    posts: RedditPostWrapper[];
+  };
+}
+
+export interface TwitterUserLegacy {
+  screen_name: string;
+  name: string;
+  profile_image_url_https: string;
+  followers_count: number;
+}
+
+export interface TwitterTweetLegacy {
+  id_str: string;
+  full_text: string;
+  created_at: string;
+  favorite_count: number;
+  reply_count: number;
+  retweet_count: number;
+  quote_count: number;
+  lang: string;
+}
+
+export interface TwitterTweetResult {
+  result?: {
+    __typename: 'Tweet';
+    legacy: TwitterTweetLegacy;
+    core: {
+      user_result: {
+        result: {
+          legacy: TwitterUserLegacy;
+        };
+      };
+    };
+    view_count_info?: {
+      count: string;
+    };
+  };
+}
+
+export interface TwitterTimelineEntry {
+  entryId: string;
+  content: {
+    __typename: string;
+    content?: {
+      __typename: string;
+      tweetResult?: TwitterTweetResult;
+    };
+  };
+}
+
+export interface TwitterApiResponse {
+  result: {
+    timeline: {
+      instructions: Array<{
+        entries: TwitterTimelineEntry[];
+      }>;
+    };
+  };
 }

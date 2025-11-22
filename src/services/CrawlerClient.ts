@@ -45,17 +45,14 @@ export class CrawlerClient {
     const cached = this.cache.get(cacheKey);
     const now = Date.now();
 
-    
     if (cached && now - cached.timestamp < config.crawl.cacheTTL) {
       logger.info(`Cache hit for key: ${cacheKey}`);
       return cached.data as T;
     }
 
-    
     logger.info(`Cache miss for key: ${cacheKey}, fetching from API`);
     const data = await fetchFn();
 
-    
     this.cache.set(cacheKey, {
       data,
       timestamp: now,
@@ -64,7 +61,6 @@ export class CrawlerClient {
     return data;
   }
 
- 
   protected clearExpiredCache(): void {
     const now = Date.now();
     const expiredKeys: string[] = [];
@@ -82,7 +78,6 @@ export class CrawlerClient {
     }
   }
 
- 
   protected async delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }

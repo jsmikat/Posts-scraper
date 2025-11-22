@@ -11,7 +11,6 @@ interface Config {
         reddit: string;
         twitter: string;
         linkedin: string;
-        threads: string;
       };
     };
   };
@@ -32,8 +31,7 @@ const config: Config = {
       hosts: {
         reddit: 'reddit34.p.rapidapi.com',
         twitter: 'twitter241.p.rapidapi.com',
-        linkedin: 'linkedin-api-data.p.rapidapi.com',
-        threads: 'threads-scraper.p.rapidapi.com',
+        linkedin: 'linkedin-data-api.p.rapidapi.com',
       },
     },
   },

@@ -1,68 +1,72 @@
 import config from '../config';
-import { Post } from '../types';
+import { Post, RedditApiResponse, RedditPostWrapper } from '../types';
 import logger from '../utils/logger';
 import { CrawlerClient } from './CrawlerClient';
 
 export class RedditCrawler extends CrawlerClient {
+  private readonly PLATFORM = 'Reddit';
+
   async searchPosts(keyword: string): Promise<Post[]> {
     const cacheKey = `reddit:${keyword}:${config.crawl.maxPostsPerKeyword}`;
 
     try {
       return await this.getCached(cacheKey, async () => {
-        const response = await this.client.get('https://reddit34.p.rapidapi.com/getSearchPosts', {
-          params: {
-            query: keyword,
-          },
-          headers: {
-            'x-rapidapi-key': config.api.rapidApi.key,
-            'x-rapidapi-host': config.api.rapidApi.hosts.reddit,
-          },
-        });
+        const response = await this.fetchRedditPosts(keyword);
+        const posts = this.transformRedditPosts(response.data?.posts || []);
 
-        interface RedditPost {
-          id?: string;
-          post_id?: string;
-          title?: string;
-          selftext?: string;
-          text?: string;
-          body?: string;
-          author?: string;
-          author_name?: string;
-          url?: string;
-          permalink?: string;
-          created_utc?: number;
-          created_at?: string;
-          ups?: number;
-          upvotes?: number;
-          score?: number;
-          num_comments?: number;
-          comment_count?: number;
-        }
-
-        const posts: Post[] = (response.data.data?.posts || response.data.posts || [])
-          .slice(0, config.crawl.maxPostsPerKeyword)
-          .map((post: RedditPost) => ({
-            id: post.id || post.post_id || `reddit-${Date.now()}-${Math.random()}`,
-            title: post.title,
-            content: post.selftext || post.text || post.body || post.title || '',
-            author: post.author || post.author_name || 'Reddit User',
-            url: post.url || post.permalink || `https://reddit.com${post.permalink || ''}`,
-            createdAt: post.created_utc
-              ? new Date(post.created_utc * 1000).toISOString()
-              : post.created_at || new Date().toISOString(),
-            engagement: {
-              likes: post.ups || post.upvotes || post.score || 0,
-              comments: post.num_comments || post.comment_count || 0,
-            },
-          }));
-
-        logger.info(`Fetched ${posts.length} posts from Reddit for keyword: ${keyword}`);
+        logger.info(`Fetched ${posts.length} posts from ${this.PLATFORM} for keyword: ${keyword}`);
         return posts;
       });
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : String(error);
-      logger.error(`Reddit crawl failed for keyword "${keyword}": ${message}`);
-      return [];
+      return this.handleError(error, keyword);
     }
+  }
+
+  private async fetchRedditPosts(keyword: string): Promise<RedditApiResponse> {
+    const response = await this.client.get<RedditApiResponse>(
+      'https://reddit34.p.rapidapi.com/getSearchPosts',
+      {
+        params: {
+          query: keyword,
+        },
+        headers: {
+          'x-rapidapi-key': config.api.rapidApi.key,
+          'x-rapidapi-host': config.api.rapidApi.hosts.reddit,
+        },
+      }
+    );
+
+    return response.data;
+  }
+
+  private transformRedditPosts(rawPosts: RedditPostWrapper[]): Post[] {
+    return rawPosts
+      .slice(0, config.crawl.maxPostsPerKeyword)
+      .map((item) => this.transformSinglePost(item));
+  }
+
+  private transformSinglePost(item: RedditPostWrapper): Post {
+    const post = item.data;
+
+    return {
+      id: post.id,
+      title: post.title,
+      content: post.selftext || post.title,
+      author: post.author,
+      url: post.url || `https://www.reddit.com${post.permalink}`,
+      createdAt: new Date(post.created_utc * 1000).toISOString(),
+      engagement: {
+        likes: post.ups,
+        comments: post.num_comments,
+        ratio: post.upvote_ratio,
+        views: post.view_count || 0,
+      },
+    };
+  }
+
+  private handleError(error: unknown, keyword: string): Post[] {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error(`${this.PLATFORM} crawl failed for keyword "${keyword}": ${message}`);
+    return [];
   }
 }
