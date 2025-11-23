@@ -4,8 +4,6 @@ import logger from '../utils/logger';
 import { CrawlerClient } from './CrawlerClient';
 
 export class RedditCrawler extends CrawlerClient {
-  private readonly PLATFORM = 'Reddit';
-
   async searchPosts(keyword: string): Promise<Post[]> {
     const cacheKey = `reddit:${keyword}:${config.crawl.maxPostsPerKeyword}`;
 
@@ -13,8 +11,6 @@ export class RedditCrawler extends CrawlerClient {
       return await this.getCached(cacheKey, async () => {
         const response = await this.fetchRedditPosts(keyword);
         const posts = this.transformRedditPosts(response.data?.posts || []);
-
-        logger.info(`Fetched ${posts.length} posts from ${this.PLATFORM} for keyword: ${keyword}`);
         return posts;
       });
     } catch (error: unknown) {
@@ -66,7 +62,7 @@ export class RedditCrawler extends CrawlerClient {
 
   private handleError(error: unknown, keyword: string): Post[] {
     const message = error instanceof Error ? error.message : String(error);
-    logger.error(`${this.PLATFORM} crawl failed for keyword "${keyword}": ${message}`);
+    logger.error(`Reddit crawl failed for keyword "${keyword}": ${message}`);
     return [];
   }
 }

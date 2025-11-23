@@ -3,16 +3,16 @@ import { Post, PostResult } from '../types';
 import logger from '../utils/logger';
 import { LinkedInCrawler } from './LinkedInCrawler';
 import { RedditCrawler } from './RedditCrawler';
-import { TwitterCrawler } from './TwitterCrawler';
+import { XCrawler } from './TwitterCrawler';
 
 export class CrawlerOrchestrator {
   private redditCrawler: RedditCrawler;
-  private twitterCrawler: TwitterCrawler;
+  private twitterCrawler: XCrawler;
   private linkedInCrawler: LinkedInCrawler;
 
   constructor() {
     this.redditCrawler = new RedditCrawler();
-    this.twitterCrawler = new TwitterCrawler();
+    this.twitterCrawler = new XCrawler();
     this.linkedInCrawler = new LinkedInCrawler();
   }
 

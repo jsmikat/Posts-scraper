@@ -4,8 +4,6 @@ import logger from '../utils/logger';
 import { CrawlerClient } from './CrawlerClient';
 
 export class LinkedInCrawler extends CrawlerClient {
-  private readonly PLATFORM = 'LinkedIn';
-
   async searchPosts(keyword: string): Promise<Post[]> {
     const cacheKey = `linkedin:${keyword}:${config.crawl.maxPostsPerKeyword}`;
 
@@ -13,8 +11,6 @@ export class LinkedInCrawler extends CrawlerClient {
       return await this.getCached(cacheKey, async () => {
         const response = await this.fetchLinkedInPosts(keyword);
         const posts = this.transformLinkedInPosts(response.data?.items || []);
-
-        logger.info(`Fetched ${posts.length} posts from ${this.PLATFORM} for keyword: ${keyword}`);
         return posts;
       });
     } catch (error: unknown) {
@@ -68,7 +64,7 @@ export class LinkedInCrawler extends CrawlerClient {
 
   private handleError(error: unknown, keyword: string): Post[] {
     const message = error instanceof Error ? error.message : String(error);
-    logger.error(`${this.PLATFORM} crawl failed for keyword "${keyword}": ${message}`);
+    logger.error(`LinkedIn crawl failed for keyword "${keyword}": ${message}`);
     return [];
   }
 }

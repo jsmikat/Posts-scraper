@@ -102,57 +102,55 @@ export interface RedditApiResponse {
   };
 }
 
-export interface TwitterUserLegacy {
-  screen_name: string;
-  name: string;
-  profile_image_url_https: string;
-  followers_count: number;
-}
-
-export interface TwitterTweetLegacy {
-  id_str: string;
+export interface XLegacy {
   full_text: string;
   created_at: string;
   favorite_count: number;
   reply_count: number;
   retweet_count: number;
   quote_count: number;
-  lang: string;
+  id_str: string;
 }
 
-export interface TwitterTweetResult {
-  result?: {
-    __typename: 'Tweet';
-    legacy: TwitterTweetLegacy;
-    core: {
-      user_result: {
-        result: {
-          legacy: TwitterUserLegacy;
-        };
+export interface XUserLegacy {
+  screen_name: string;
+  name: string;
+  followers_count: number;
+}
+
+export interface TweetResult {
+  __typename: 'Tweet';
+  rest_id: string;
+  legacy: XLegacy;
+  core: {
+    user_results: {
+      result: {
+        legacy: XUserLegacy;
       };
     };
-    view_count_info?: {
-      count: string;
-    };
+  };
+  views?: {
+    count: string;
   };
 }
 
-export interface TwitterTimelineEntry {
+export interface XEntry {
   entryId: string;
   content: {
-    __typename: string;
-    content?: {
-      __typename: string;
-      tweetResult?: TwitterTweetResult;
+    entryType: string;
+    itemContent?: {
+      tweet_results?: {
+        result?: TweetResult;
+      };
     };
   };
 }
 
-export interface TwitterApiResponse {
+export interface XApiResponse {
   result: {
     timeline: {
       instructions: Array<{
-        entries: TwitterTimelineEntry[];
+        entries: XEntry[];
       }>;
     };
   };
