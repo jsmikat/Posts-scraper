@@ -3,16 +3,16 @@ import { Post, PostResult } from '../types';
 import logger from '../utils/logger';
 import { LinkedInCrawler } from './LinkedInCrawler';
 import { RedditCrawler } from './RedditCrawler';
-import { XCrawler } from './TwitterCrawler';
+import { XCrawler } from './XCrawler';
 
 export class CrawlerOrchestrator {
   private redditCrawler: RedditCrawler;
-  private twitterCrawler: XCrawler;
+  private xCrawler: XCrawler;
   private linkedInCrawler: LinkedInCrawler;
 
   constructor() {
     this.redditCrawler = new RedditCrawler();
-    this.twitterCrawler = new XCrawler();
+    this.xCrawler = new XCrawler();
     this.linkedInCrawler = new LinkedInCrawler();
   }
 
@@ -42,9 +42,7 @@ export class CrawlerOrchestrator {
       this.crawlPlatform('reddit', trimmedKeyword, () =>
         this.redditCrawler.searchPosts(trimmedKeyword)
       ),
-      this.crawlPlatform('twitter', trimmedKeyword, () =>
-        this.twitterCrawler.searchPosts(trimmedKeyword)
-      ),
+      this.crawlPlatform('x', trimmedKeyword, () => this.xCrawler.searchPosts(trimmedKeyword)),
       this.crawlPlatform('linkedin', trimmedKeyword, () =>
         this.linkedInCrawler.searchPosts(trimmedKeyword)
       ),
@@ -65,7 +63,7 @@ export class CrawlerOrchestrator {
   }
 
   private async crawlPlatform(
-    platform: 'reddit' | 'twitter' | 'linkedin',
+    platform: 'reddit' | 'x' | 'linkedin',
     keyword: string,
     crawlFn: () => Promise<Post[]>
   ): Promise<PostResult> {

@@ -19,7 +19,7 @@ export class XCrawler extends CrawlerClient {
             },
             headers: {
               'x-rapidapi-key': config.api.rapidApi.key,
-              'x-rapidapi-host': config.api.rapidApi.hosts.twitter,
+              'x-rapidapi-host': config.api.rapidApi.hosts.x,
             },
           }
         );

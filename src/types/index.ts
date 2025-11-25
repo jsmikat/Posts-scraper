@@ -3,7 +3,7 @@ export interface CrawlRequest {
 }
 
 export interface PostResult {
-  platform: 'reddit' | 'twitter' | 'linkedin';
+  platform: 'reddit' | 'x' | 'linkedin';
   keyword: string;
   posts: Post[];
   error?: string;

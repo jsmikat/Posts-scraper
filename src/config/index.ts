@@ -9,7 +9,7 @@ interface Config {
       key: string;
       hosts: {
         reddit: string;
-        twitter: string;
+        x: string;
         linkedin: string;
       };
     };
@@ -30,7 +30,7 @@ const config: Config = {
       key: process.env.RAPIDAPI_KEY || '',
       hosts: {
         reddit: 'reddit34.p.rapidapi.com',
-        twitter: 'twitter241.p.rapidapi.com',
+        x: 'twitter241.p.rapidapi.com',
         linkedin: 'linkedin-data-api.p.rapidapi.com',
       },
     },
