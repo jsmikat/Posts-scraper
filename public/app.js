@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api/crawl';
+const API_URL = '/api/crawl';
 
 const state = {
   keywords: [],
